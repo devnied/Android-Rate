@@ -2,6 +2,7 @@ package hotchemi.android.rate;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -36,7 +37,18 @@ final class DialogManager {
             public void onClick(DialogInterface dialog, int which) {
                 final Intent intentToAppstore = options.getStoreType() == StoreType.GOOGLEPLAY ?
                 createIntentForGooglePlay(context) : createIntentForAmazonAppstore(context);
+                try {
+                    context.startActivity(intentToAppstore);
+                } catch (ActivityNotFoundException anfe) {
+                    try {
+                        intentToAppstore.setPackage(null);
+                        context.startActivity(intentToAppstore);
+                    } catch (ActivityNotFoundException ae) {
+                        // do noting
+                    }
+                }
                 context.startActivity(intentToAppstore);
+
                 setAgreeShowDialog(context, false);
                 if (listener != null) listener.onClickButton(which);
             }
